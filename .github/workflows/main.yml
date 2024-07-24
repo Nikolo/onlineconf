@@ -25,7 +25,6 @@ jobs:
         docker buildx build \
           --tag ghcr.io/${{ github.repository_owner }}/onlineconf-updater:latest \
           --file updater/Dockerfile \
-          --context updater \
           .
 
     - name: Log in to GitHub Container Registry
@@ -41,5 +40,4 @@ jobs:
           --tag ghcr.io/${{ github.repository_owner }}/onlineconf-updater:latest \
           --push \
           --file updater/Dockerfile \
-          --context updater \
           .
