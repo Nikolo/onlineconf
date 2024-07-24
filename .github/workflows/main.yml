@@ -6,6 +6,7 @@ on:
       - master
     paths:
       - 'updater/**'
+      - '.github/workflows/main.yml'
 
   workflow_dispatch:
 
@@ -22,10 +23,7 @@ jobs:
 
     - name: Build Docker image
       run: |
-        docker buildx build \
-          --tag ghcr.io/nikolo/onlineconf-updater:latest \
-          --file updater/Dockerfile \
-          .
+        cd updater && docker build -t ghcr.io/nikolo/onlineconf-updater:latest .
 
     - name: Log in to GitHub Container Registry
       uses: docker/login-action@v2
@@ -36,8 +34,4 @@ jobs:
 
     - name: Push Docker image
       run: |
-        docker buildx build \
-          --tag ghcr.io/nikolo/onlineconf-updater:latest \
-          --push \
-          --file updater/Dockerfile \
-          .
+        docker push ghcr.io/nikolo/onlineconf-updater:latest
