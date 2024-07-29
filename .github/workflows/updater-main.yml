@@ -25,7 +25,7 @@ jobs:
         run: |
           calculatedSha=$(git rev-parse --short ${{ github.sha }})
           echo "COMMIT_SHORT_SHA=$calculatedSha" >> $GITHUB_ENV
-          echo "REPO=${ ${{ github.repository }},,}" >> $GITHUB_ENV
+          echo "REPO=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
 
       - name: Build Docker image
         run: |
