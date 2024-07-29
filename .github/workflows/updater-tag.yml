@@ -1,0 +1,32 @@
+name: Release new version
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  make-latest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.TOKEN }}
+
+      - name: Set short git commit SHA
+        id: vars
+        run: |
+          calculatedSha=$(git rev-parse --short ${{ github.sha }})
+          echo "COMMIT_SHORT_SHA=$calculatedSha" >> $GITHUB_ENV
+
+      - name: Tag Docker image
+        run: |
+          docker image tag ghcr.io/nikolo/onlineconf-updater:$COMMIT_SHORT_SHA ghcr.io/nikolo/onlineconf-updater:latest
