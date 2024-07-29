@@ -28,7 +28,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          cd updater && docker build -t ghcr.io/${{ github.action.repo }}-updater:$COMMIT_SHORT_SHA .
+          cd updater && docker build -t ghcr.io/${{ github.action_repository }}-updater:$COMMIT_SHORT_SHA .
 
   push:
     runs-on: ubuntu-latest
@@ -43,4 +43,4 @@ jobs:
 
       - name: Push Docker image
         run: |
-          docker push ghcr.io/${{ github.action.repo }}-updater:$COMMIT_SHORT_SHA
+          docker push ghcr.io/${{ github.action_repository }}-updater:$COMMIT_SHORT_SHA
