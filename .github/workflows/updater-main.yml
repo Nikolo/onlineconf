@@ -28,7 +28,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          cd updater && docker build -t ghcr.io/${{ github.action_repository }}-updater:$COMMIT_SHORT_SHA .
+          cd updater && docker build -t ghcr.io/${{ github.repository }}-updater:$COMMIT_SHORT_SHA .
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v2
@@ -39,4 +39,4 @@ jobs:
 
       - name: Push Docker image
         run: |
-          docker push ghcr.io/${{ github.action_repository }}-updater:$COMMIT_SHORT_SHA
+          docker push ghcr.io/${{ github.repository }}-updater:$COMMIT_SHORT_SHA

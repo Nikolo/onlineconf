@@ -29,4 +29,4 @@ jobs:
 
       - name: Tag Docker image
         run: |
-          docker image tag ghcr.io/${{ github.action_repository }}-updater:$COMMIT_SHORT_SHA ghcr.io/${{ github.action_repository }}-updater:latest
+          docker image tag ghcr.io/${{ github.repository }}-updater:$COMMIT_SHORT_SHA ghcr.io/${{ github.repository }}-updater:latest
