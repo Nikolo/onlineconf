@@ -26,7 +26,8 @@ jobs:
         run: |
           calculatedSha=$(git rev-parse --short ${{ github.sha }})
           echo "COMMIT_SHORT_SHA=$calculatedSha" >> $GITHUB_ENV
+          echo "REPO=${github.repository,,}" >> $GITHUB_ENV
 
       - name: Tag Docker image
         run: |
-          docker image tag ghcr.io/${{ github.repository }}-updater:$COMMIT_SHORT_SHA ghcr.io/${{ github.repository }}-updater:latest
+          docker image tag ghcr.io/$REPO-updater:$COMMIT_SHORT_SHA ghcr.io/$REPO-updater:latest
