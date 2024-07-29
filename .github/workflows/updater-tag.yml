@@ -31,6 +31,10 @@ jobs:
           echo "COMMIT_SHORT_SHA=$calculatedSha" >> $GITHUB_ENV
           echo "REPO=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
 
+      - name: Pull Docker image
+        run: |
+          docker pull ghcr.io/$REPO-updater:$COMMIT_SHORT_SHA
+
       - name: Tag Docker image
         run: |
           docker image tag ghcr.io/$REPO-updater:$COMMIT_SHORT_SHA ghcr.io/$REPO-updater:latest
