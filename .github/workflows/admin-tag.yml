@@ -1,9 +1,5 @@
 name: Release new admin version
 
-concurrency:
-  group: ${{ github.ref }}
-  cancel-in-progress: true
-
 on:
   push:
     tags:
@@ -15,6 +11,9 @@ on:
 jobs:
   admin-make-latest:
     runs-on: ubuntu-latest
+    concurrency:
+      group: admin-tag-${{ github.ref }}
+      cancel-in-progress: true
 
     steps:
       - name: Log in to GitHub Container Registry

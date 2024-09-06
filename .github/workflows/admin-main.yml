@@ -1,9 +1,5 @@
 name: Build and Push admin docker image
 
-concurrency:
-  group: ${{ github.ref }}
-  cancel-in-progress: true
-
 on:
   push:
     branches:
@@ -15,6 +11,10 @@ on:
 jobs:
   build-and-push-admin:
     runs-on: ubuntu-latest
+
+    concurrency:
+      group: admin-${{ github.ref }}
+      cancel-in-progress: true
 
     steps:
       - name: Checkout code
