@@ -4,9 +4,6 @@ on:
   push:
     tags:
       - v*
-    paths:
-      - "updater/**"
-      - ".github/workflows/updater-*.yml"
 
 jobs:
   updater-make-latest:

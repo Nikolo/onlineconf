@@ -4,9 +4,6 @@ on:
   push:
     tags:
       - v*
-    paths:
-      - "admin/**"
-      - ".github/workflows/admin-*.yml"
 
 jobs:
   admin-make-latest:
