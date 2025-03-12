@@ -1,8 +1,7 @@
-version: '3'
+version: "3"
 services:
   onlineconf-updater:
-    build: .
-    image: onlineconf-updater
+    image: ghcr.io/nikolo/onlineconf-updater:latest
     volumes:
       - ./data:/usr/local/etc/onlineconf
     environment:
