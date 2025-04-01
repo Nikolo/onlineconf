@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/onlineconf/onlineconf/updater/v3/updater"
+	"github.com/Nikolo/onlineconf/updater/v3/updater"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v3"
 )

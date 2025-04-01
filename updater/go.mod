@@ -1,4 +1,4 @@
-module github.com/onlineconf/onlineconf/updater/v3
+module github.com/Nikolo/onlineconf/updater/v3
 
 go 1.18
 

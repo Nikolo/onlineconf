@@ -1,6 +1,6 @@
 FROM golang
 
-WORKDIR /go/src/github.com/onlineconf/onlineconf/updater
+WORKDIR /go/src/github.com/Nikolo/onlineconf/updater
 
 COPY go.* ./
 RUN go mod download
@@ -11,7 +11,7 @@ RUN go build -o onlineconf-updater
 
 FROM debian
 
-COPY --from=0 /go/src/github.com/onlineconf/onlineconf/updater/onlineconf-updater /usr/local/bin/onlineconf-updater
+COPY --from=0 /go/src/github.com/Nikolo/onlineconf/updater/onlineconf-updater /usr/local/bin/onlineconf-updater
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
 RUN apt-get -y update \
