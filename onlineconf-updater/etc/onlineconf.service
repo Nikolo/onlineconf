@@ -1,0 +1,20 @@
+[Unit]
+Description=OnlineConf Updater
+Requires=cronolog@%p.service
+After=cronolog@%p.service
+
+[Service]
+Type=simple
+LimitCORE=infinity
+EnvironmentFile=-/etc/sysconfig/onlineconf-updater
+ExecStart=/usr/local/bin/onlineconf-updater $OPTIONS
+ExecReload=/bin/kill -HUP $MAINPID
+KillSignal=SIGINT
+Restart=always
+StandardOutput=tty
+StandardError=tty
+TTYPath=/run/cronolog@%p.tty
+NotifyAccess=all
+
+[Install]
+WantedBy=multi-user.target
