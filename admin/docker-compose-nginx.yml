@@ -1,4 +1,3 @@
-version: "3"
 services:
   onlineconf-admin:
     image: ghcr.io/nikolo/onlineconf-admin:latest
