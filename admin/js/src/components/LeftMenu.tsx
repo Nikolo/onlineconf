@@ -55,7 +55,6 @@ class ListLink extends React.Component<ListLinkProps> {
 
 const ClassicLink = React.forwardRef(
 	function ClassicLink(props: LinkProps, ref: React.Ref<HTMLAnchorElement>) {
-		// eslint-disable-next-line jsx-a11y/anchor-has-content
 		return <a href="/classic/" {...props} ref={ref}/>;
 	}
 );
