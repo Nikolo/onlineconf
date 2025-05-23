@@ -16,6 +16,7 @@ import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import DeleteIcon from '@mui/icons-material/Delete';
 import LowPriorityIcon from '@mui/icons-material/LowPriority';
+import CallSplitIcon from '@mui/icons-material/CallSplit';
 import InsertCommentIcon from '@mui/icons-material/InsertComment';
 
 import { IParamNode } from './common';
@@ -43,6 +44,7 @@ export interface ParamMenuProps extends Pick<MenuProps, 'anchorEl'> {
 	onReload: () => void;
 	onDelete: () => void;
 	onMove: () => void;
+	onCopy: () => void;
 	onDescribe: () => void;
 }
 
@@ -90,6 +92,10 @@ export default function ParamMenu(props: ParamMenuProps) {
 			<MenuItem onClick={props.onMove} disabled={props.param.rw !== true}>
 				<ListItemIcon><LowPriorityIcon/></ListItemIcon>
 				<ListItemText primary={t('param.menu.move')}/>
+			</MenuItem>
+			<MenuItem onClick={props.onCopy}>
+				<ListItemIcon><CallSplitIcon/></ListItemIcon>
+				<ListItemText primary={t('param.menu.copy')}/>
 			</MenuItem>
 			<MenuItem onClick={props.onDelete} disabled={props.param.rw !== true || props.param.num_children !== 0} divider>
 				<ListItemIcon><DeleteIcon/></ListItemIcon>

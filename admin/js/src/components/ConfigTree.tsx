@@ -15,6 +15,7 @@ import ParamDeleteConfirm from './ParamDeleteConfirm';
 import ParamDescribe from './ParamDescribe';
 import ParamLog from './ParamLog';
 import ParamMove from './ParamMove';
+import ParamCopy from './ParamCopy';
 import ParamNotification from './ParamNotification';
 import Tree from './Tree';
 import ValuePopover from './ValuePopover';
@@ -540,12 +541,12 @@ class ConfigTree extends React.Component< ConfigTreeProps & WithStyles<'icon'>, 
 		});
 	};
 
-	handleMove = (param: IParamNode) => {
+	handleCopy = (param: IParamNode) => {
 		this.setState({
-			dialog: <ParamMove
+			dialog: <ParamCopy
 				path={param.path}
 				version={param.version}
-				onMoved={path => this.handleMoved(param, path)}
+				onCopied={path => this.handleMovedOrCopied(param, path)}
 				onError={this.props.onError}
 				onClose={this.handleDialogClose}
 			/>,
@@ -553,7 +554,20 @@ class ConfigTree extends React.Component< ConfigTreeProps & WithStyles<'icon'>, 
 		});
 	};
 
-	handleMoved = async (param: IParamNode, path: string) => {
+	handleMove = (param: IParamNode) => {
+		this.setState({
+			dialog: <ParamMove
+				path={param.path}
+				version={param.version}
+				onMoved={path => this.handleMovedOrCopied(param, path)}
+				onError={this.props.onError}
+				onClose={this.handleDialogClose}
+			/>,
+			menu: undefined,
+		});
+	};
+
+	handleMovedOrCopied = async (param: IParamNode, path: string) => {
 		try {
 			await this.loadNodes([parentPath(param.path), parentPath(path)], {
 				reload: true,
@@ -719,6 +733,7 @@ class ConfigTree extends React.Component< ConfigTreeProps & WithStyles<'icon'>, 
 							onReload={this.handleReload}
 							onDelete={this.handleDelete}
 							onMove={this.handleMove}
+							onCopy={this.handleCopy}
 							onValuePopoverOpen={this.handleValuePopoverOpen}
 							onValuePopoverClose={this.handleValuePopoverClose}
 						/>

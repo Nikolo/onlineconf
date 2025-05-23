@@ -34,6 +34,7 @@ const resources = {
 					edit: 'Edit',
 					describe: 'Describe',
 					move: 'Move',
+					copy: 'Copy',
 					delete: 'Delete',
 					access: 'Access',
 					notifications: 'Notifications',
@@ -74,6 +75,9 @@ const resources = {
 				move: {
 					to: 'Move to',
 					symlink: 'Leave symlink',
+				},
+				copy: {
+					to: 'Copy to',
 				},
 				delete: {
 					confirm: 'Are you really want to delete {{param}}?',
@@ -142,6 +146,7 @@ const resources = {
 					edit: 'Изменить',
 					describe: 'Описать',
 					move: 'Переместить',
+					copy: 'Скопировать',
 					delete: 'Удалить',
 					access: 'Доступ',
 					notifications: 'Уведомления',
@@ -182,6 +187,9 @@ const resources = {
 				move: {
 					to: 'Переместить в',
 					symlink: 'Оставить симлинк',
+				},
+				copy: {
+					to: 'Скопировать в',
 				},
 				delete: {
 					confirm: 'Вы действительно хотите удалить {{param}}?',

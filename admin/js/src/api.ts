@@ -16,6 +16,7 @@ export type Notification = 'none' | 'no-value' | 'with-value';
 
 interface ParamFields {
 	path: string;
+	copy_path: string;
 	name: string;
 	mime: ParamType;
 	data: string | null;
@@ -46,13 +47,13 @@ const commonUrlencodedOptions = {
 	headers: { ...commonOptions.headers, 'Content-Type': 'application/x-www-form-urlencoded' },
 };
 
-export async function getParam(path: string, symlink?: 'resolve' | 'follow', depth?: 'children' | 'subtree', options: AxiosRequestConfig = {}) {
+export async function getParam (path: string, symlink?: 'resolve' | 'follow', depth?: 'children' | 'subtree', options: AxiosRequestConfig = {}) {
 	const params = { symlink, depth };
 	const response = await axios.get<IParam>('/config' + path, { ...options, ...commonOptions, params });
 	return response.data;
 }
 
-export async function postParam(path: string, modify: ParamModify) {
+export async function postParam (path: string, modify: ParamModify) {
 	const { data, notification, symlink, ...rest } = modify;
 	const params = new URLSearchParams(rest as Record<string, string>);
 	if (data !== undefined) {
@@ -68,7 +69,7 @@ export async function postParam(path: string, modify: ParamModify) {
 	return response.data;
 }
 
-export async function deleteParam(path: string, info: { version: number, comment: string }) {
+export async function deleteParam (path: string, info: { version: number, comment: string }) {
 	const response = await axios.request<void>({
 		...commonUrlencodedOptions,
 		url: '/config' + path,
@@ -78,16 +79,16 @@ export async function deleteParam(path: string, info: { version: number, comment
 	return response.data;
 }
 
-export async function batchGetParams(paths: string[]) {
+export async function batchGetParams (paths: string[]) {
 	const data = new URLSearchParams();
 	for (const path of paths) {
 		data.append('id[]', path);
 	}
-	const response = await axios.post<{[key: string]: IParam}>('/batch/GET/config', data, commonOptions);
+	const response = await axios.post<{ [key: string]: IParam }>('/batch/GET/config', data, commonOptions);
 	return response.data;
 }
 
-export async function getParams(paths: Set<string>) {
+export async function getParams (paths: Set<string>) {
 	if (paths.size === 0) {
 		return {};
 	} else if (paths.size === 1) {
@@ -98,7 +99,7 @@ export async function getParams(paths: Set<string>) {
 	}
 }
 
-export async function search(term: string) {
+export async function search (term: string) {
 	const response = await axios.get<IParam[]>('/search', { ...commonOptions, params: { term } });
 	return response.data;
 }
@@ -124,7 +125,7 @@ export interface IParamLog {
 	same: boolean;
 }
 
-export async function getParamLog(path: string, lastID?: number, options: AxiosRequestConfig = {}) {
+export async function getParamLog (path: string, lastID?: number, options: AxiosRequestConfig = {}) {
 	const params: LogPagination = { lastid: lastID };
 	const response = await axios.get<IParamLog[]>('/log' + path, { ...options, ...commonOptions, params });
 	return response.data;
@@ -142,7 +143,7 @@ interface GlobalLogParams extends DistributiveOmit<GlobalLogFilter, 'all'>, LogP
 	all?: 1;
 }
 
-export async function getGlobalLog(filter: GlobalLogFilter, lastID?: number, options: AxiosRequestConfig = {}) {
+export async function getGlobalLog (filter: GlobalLogFilter, lastID?: number, options: AxiosRequestConfig = {}) {
 	const params: GlobalLogParams = {};
 	for (const k of ['author', 'branch', 'from', 'till'] as const) {
 		if (filter[k] !== undefined && filter[k] !== '') {
@@ -167,18 +168,18 @@ export interface Server {
 	package: string;
 }
 
-export async function getServers() {
+export async function getServers () {
 	const response = await axios.get<Server[]>('/monitoring', commonOptions);
 	return response.data;
 }
 
-export async function deleteServer(host: string) {
+export async function deleteServer (host: string) {
 	const response = await axios.delete('/monitoring/' + host, commonOptions);
 	return response.data;
 }
 
 
-export async function getAccess() {
+export async function getAccess () {
 	const access: { [key: string]: string[] } = {};
 	const response = await axios.get<string[]>('/group/', commonOptions);
 	const promises = response.data.map(group => {
@@ -190,22 +191,22 @@ export async function getAccess() {
 	return access;
 }
 
-export async function createGroup(group: string) {
+export async function createGroup (group: string) {
 	const response = await axios.post('/group/' + group, undefined, commonOptions);
 	return response.data;
 }
 
-export async function deleteGroup(group: string) {
+export async function deleteGroup (group: string) {
 	const response = await axios.delete('/group/' + group, commonOptions);
 	return response.data;
 }
 
-export async function addUser(group: string, user: string) {
+export async function addUser (group: string, user: string) {
 	const response = await axios.post('/group/' + group + '/' + user, undefined, commonOptions);
 	return response.data;
 }
 
-export async function removeUser(group: string, user: string) {
+export async function removeUser (group: string, user: string) {
 	const response = await axios.delete('/group/' + group + '/' + user, commonOptions);
 	return response.data;
 }
@@ -217,12 +218,12 @@ export interface ParamAccessGroup {
 	rw: boolean | null;
 }
 
-export async function getParamAccess(path: string, options: AxiosRequestConfig = {}) {
+export async function getParamAccess (path: string, options: AxiosRequestConfig = {}) {
 	const response = await axios.get<ParamAccessGroup[]>('/access' + path, { ...options, ...commonOptions });
 	return response.data;
 }
 
-export async function postParamAccess(path: string, group: string, rw: boolean | null) {
+export async function postParamAccess (path: string, group: string, rw: boolean | null) {
 	const response = await axios.post<ParamAccessGroup>(
 		'/access' + path,
 		new URLSearchParams({ group, rw: String(rw) }),
@@ -231,7 +232,7 @@ export async function postParamAccess(path: string, group: string, rw: boolean |
 	return response.data;
 }
 
-export async function deleteParamAccess(path: string, group: string) {
+export async function deleteParamAccess (path: string, group: string) {
 	const response = await axios.request<ParamAccessGroup>({
 		...commonUrlencodedOptions,
 		url: '/access' + path,
@@ -246,12 +247,12 @@ interface WhoAmI {
 	can_edit_groups: boolean;
 }
 
-export async function getWhoAmI() {
+export async function getWhoAmI () {
 	const response = await axios.get<WhoAmI>('/whoami', commonOptions);
 	return response.data;
 }
 
-export async function getUsers(term: string) {
+export async function getUsers (term: string) {
 	const response = await axios.get<string[]>('/user', { ...commonOptions, params: { term } });
 	return response.data;
 }
@@ -272,7 +273,7 @@ export interface AvatarConfig {
 	};
 }
 
-export async function getUIConfig() {
+export async function getUIConfig () {
 	const response = await axios.get<UIConfig>('/ui-config', commonOptions);
 	return response.data;
 }

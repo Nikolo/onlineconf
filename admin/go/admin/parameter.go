@@ -9,20 +9,19 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/onlineconf/onlineconf/admin/go/common"
 	"gopkg.in/yaml.v3"
-
-	. "github.com/onlineconf/onlineconf/admin/go/common"
 )
 
 var (
-	ErrAccessDenied    = errors.New("Access denied")
-	ErrAlreadyExists   = errors.New("Parameter already exists")
-	ErrVersionNotMatch = errors.New("Version not match")
-	ErrCommentRequired = errors.New("Comment required")
-	ErrInvalidValue    = errors.New("Invalid value")
-	ErrNotEmpty        = errors.New("Parameter has children")
-	ErrNotFound        = errors.New("Parameter not found")
-	ErrParentNotFound  = errors.New("Parent not found")
+	ErrAccessDenied    = errors.New("access denied")
+	ErrAlreadyExists   = errors.New("parameter already exists")
+	ErrVersionNotMatch = errors.New("version not match")
+	ErrCommentRequired = errors.New("comment required")
+	ErrInvalidValue    = errors.New("invalid value")
+	ErrNotEmpty        = errors.New("parameter has children")
+	ErrNotFound        = errors.New("parameter not found")
+	ErrParentNotFound  = errors.New("parent not found")
 )
 
 const selectFields string = `
@@ -39,28 +38,28 @@ const selectFromConfig string = selectFields + `
 `
 
 type Parameter struct {
-	ID                   int           `json:"-"`
-	Name                 string        `json:"name"`
-	ParentID             sql.NullInt64 `json:"-"`
-	Path                 string        `json:"path"`
-	Value                NullString    `json:"data"`
-	ContentType          string        `json:"mime"`
-	Summary              string        `json:"summary"`
-	Description          string        `json:"description"`
-	Version              int           `json:"version"`
-	MTime                string        `json:"mtime"`
-	Deleted              bool          `json:"-"`
-	NumChildren          int           `json:"num_children"`
-	AccessModified       bool          `json:"access_modified"`
-	RW                   NullBool      `json:"rw"`
-	Notification         string        `json:"notification"`
-	NotificationModified bool          `json:"notification_modified"`
+	ID                   int               `json:"-"`
+	Name                 string            `json:"name"`
+	ParentID             sql.NullInt64     `json:"-"`
+	Path                 string            `json:"path"`
+	Value                common.NullString `json:"data"`
+	ContentType          string            `json:"mime"`
+	Summary              string            `json:"summary"`
+	Description          string            `json:"description"`
+	Version              int               `json:"version"`
+	MTime                string            `json:"mtime"`
+	Deleted              bool              `json:"-"`
+	NumChildren          int               `json:"num_children"`
+	AccessModified       bool              `json:"access_modified"`
+	RW                   common.NullBool   `json:"rw"`
+	Notification         string            `json:"notification"`
+	NotificationModified bool              `json:"notification_modified"`
 }
 
 func SelectParameter(ctx context.Context, path string) (*Parameter, error) {
 	query := selectFromConfig + "WHERE Path = ? AND NOT Deleted\n"
 
-	row := DB.QueryRowContext(ctx, query, Username(ctx), path)
+	row := common.DB.QueryRowContext(ctx, query, common.Username(ctx), path)
 	p := Parameter{}
 	err := row.Scan(
 		&p.ID, &p.Name, &p.ParentID, &p.Path, &p.Value, &p.ContentType,
@@ -74,7 +73,7 @@ func SelectParameter(ctx context.Context, path string) (*Parameter, error) {
 		return nil, err
 	}
 	if !p.RW.Valid {
-		p.Value = NullString{}
+		p.Value = common.NullString{}
 	}
 	return &p, nil
 }
@@ -165,8 +164,8 @@ func selectChildren(ctx context.Context, params []ParameterWithDescendants) erro
 		WHERE ParentID IN (` + marksStr + `) AND NOT Deleted
 		ORDER BY Name
 	`
-	binds := append([]interface{}{Username(ctx)}, ids...)
-	rows, err := DB.QueryContext(ctx, query, binds...)
+	binds := append([]interface{}{common.Username(ctx)}, ids...)
+	rows, err := common.DB.QueryContext(ctx, query, binds...)
 	if err != nil {
 		return err
 	}
@@ -182,7 +181,7 @@ func selectChildren(ctx context.Context, params []ParameterWithDescendants) erro
 			return err
 		}
 		if !c.RW.Valid {
-			c.Value = NullString{}
+			c.Value = common.NullString{}
 		}
 		parent := paramsMap[int(c.ParentID.Int64)]
 		parent.AddChild(c)
@@ -270,7 +269,7 @@ func SelectWithChildrenMulti(ctx context.Context, paths []string) (map[string]*P
 		return map[string]*ParameterWithChildren{}, nil
 	}
 	pathMap := make(map[string]bool, len(paths))
-	binds := []interface{}{Username(ctx)}
+	binds := []interface{}{common.Username(ctx)}
 	for _, path := range paths {
 		binds = append(binds, path)
 		pathMap[path] = true
@@ -283,7 +282,7 @@ func SelectWithChildrenMulti(ctx context.Context, paths []string) (map[string]*P
 		marks[i] = "?"
 	}
 	marksStr := strings.Join(marks, ", ")
-	rows, err := DB.QueryContext(ctx, selectFields+`
+	rows, err := common.DB.QueryContext(ctx, selectFields+`
 		FROM (
 			SELECT t.*
 			FROM my_config_tree t
@@ -313,7 +312,7 @@ func SelectWithChildrenMulti(ctx context.Context, paths []string) (map[string]*P
 			return nil, err
 		}
 		if !p.RW.Valid {
-			p.Value = NullString{}
+			p.Value = common.NullString{}
 		}
 		if pathMap[p.Path] {
 			result[p.Path] = &ParameterWithChildren{
@@ -334,13 +333,13 @@ func SelectWithChildrenMulti(ctx context.Context, paths []string) (map[string]*P
 func SearchParameters(ctx context.Context, term string) ([]Parameter, error) {
 	like := "%" + likeEscape(term) + "%"
 	publicSearch := `Summary LIKE ? OR Description LIKE ?`
-	bind := []interface{}{Username(ctx), like, like, like, like, like}
+	bind := []interface{}{common.Username(ctx), like, like, like, like, like}
 	isASCII := strings.IndexFunc(term, func(r rune) bool { return r > unicode.MaxASCII }) == -1
 	if isASCII {
 		publicSearch = `Name COLLATE ascii_general_ci LIKE ? OR ` + publicSearch
 		bind = append(bind, like, like)
 	}
-	rows, err := DB.QueryContext(ctx, `
+	rows, err := common.DB.QueryContext(ctx, `
 		SELECT * FROM (
 			`+selectFromConfig+`
 			WHERE NOT Deleted
@@ -366,15 +365,15 @@ func SearchParameters(ctx context.Context, term string) ([]Parameter, error) {
 			return nil, err
 		}
 		if !p.RW.Valid {
-			p.Value = NullString{}
+			p.Value = common.NullString{}
 		}
 		list = append(list, p)
 	}
 	return list, nil
 }
 
-func CreateParameter(ctx context.Context, path, contentType, value string, optSummary, optDescription, optNotification NullString, comment string) error {
-	var nullValue NullString
+func CreateParameter(ctx context.Context, path, contentType, value string, optSummary, optDescription, optNotification common.NullString, comment string) error {
+	var nullValue common.NullString
 	if contentType != "application/x-null" {
 		nullValue.Valid = true
 		nullValue.String = value
@@ -384,7 +383,7 @@ func CreateParameter(ctx context.Context, path, contentType, value string, optSu
 		return err
 	}
 
-	var notification NullString
+	var notification common.NullString
 	if optNotification.Valid {
 		if err := validateNotification(ctx, optNotification.String); err != nil {
 			return err
@@ -395,7 +394,7 @@ func CreateParameter(ctx context.Context, path, contentType, value string, optSu
 		}
 	}
 
-	tx, err := DB.BeginTx(ctx, nil)
+	tx, err := common.DB.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
@@ -449,7 +448,7 @@ func CreateParameter(ctx context.Context, path, contentType, value string, optSu
 }
 
 func SetParameter(ctx context.Context, path string, version int, contentType string, value string, comment string) error {
-	var nullValue NullString
+	var nullValue common.NullString
 	if contentType != "application/x-null" {
 		nullValue.Valid = true
 		nullValue.String = value
@@ -459,7 +458,7 @@ func SetParameter(ctx context.Context, path string, version int, contentType str
 		return err
 	}
 
-	tx, err := DB.BeginTx(ctx, nil)
+	tx, err := common.DB.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
@@ -484,10 +483,112 @@ func SetParameter(ctx context.Context, path string, version int, contentType str
 	return tx.Commit()
 }
 
+func CopyTree(ctx context.Context, children []ParameterWithSubtree, path, newPath, comment string) error {
+	for _, child := range children {
+		newFullPath := newPath + child.Path[len(path):]
+		err := CreateParameter(ctx,
+			newFullPath,
+			child.ContentType,
+			child.Value.String,
+			common.NullString{
+				NullString: sql.NullString{
+					Valid:  true,
+					String: child.Summary,
+				},
+			},
+			common.NullString{
+				NullString: sql.NullString{
+					Valid:  true,
+					String: child.Description,
+				},
+			},
+			common.NullString{
+				NullString: sql.NullString{
+					Valid:  true,
+					String: child.Notification,
+				},
+			},
+			comment)
+		if err != nil {
+			return err
+		}
+
+		if len(child.Children) > 0 {
+			err = CopyTree(ctx, child.Children, path, newPath, comment)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func CopyParameter(ctx context.Context, path string, newPath string, version int, comment string) error {
+	tx, err := common.DB.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	p, err := SelectParameter(ctx, path)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	err = CreateParameter(ctx,
+		newPath,
+		p.ContentType,
+		p.Value.String,
+		common.NullString{
+			NullString: sql.NullString{
+				Valid:  true,
+				String: p.Summary,
+			},
+		},
+		common.NullString{
+			NullString: sql.NullString{
+				Valid:  true,
+				String: p.Description,
+			},
+		},
+		common.NullString{
+			NullString: sql.NullString{
+				Valid:  true,
+				String: p.Notification,
+			},
+		},
+		comment)
+	if err != nil {
+		tx.Rollback()
+
+		return err
+	}
+
+	if p.Version != version {
+		tx.Rollback()
+		return ErrVersionNotMatch
+	}
+
+	subtree, err := p.WithSubtree(ctx)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	err = CopyTree(ctx, subtree.Children, path, newPath, comment)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return nil
+}
+
 func MoveParameter(ctx context.Context, path string, newPath string, symlink bool, version int, comment string) error {
 	newParentPath, newName := splitPath(newPath)
 
-	tx, err := DB.BeginTx(ctx, nil)
+	tx, err := common.DB.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
@@ -522,7 +623,7 @@ func MoveParameter(ctx context.Context, path string, newPath string, symlink boo
 	}
 
 	if err == nil && symlink {
-		var nullNotification NullString
+		var nullNotification common.NullString
 		if p.NotificationModified {
 			nullNotification.Valid = true
 			nullNotification.String = p.Notification
@@ -542,7 +643,7 @@ func MoveParameter(ctx context.Context, path string, newPath string, symlink boo
 }
 
 func SetParameterDescription(ctx context.Context, path string, summary, description string) error {
-	tx, err := DB.BeginTx(ctx, nil)
+	tx, err := common.DB.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
@@ -566,13 +667,13 @@ func SetParameterNotification(ctx context.Context, path string, notification str
 		return err
 	}
 
-	var nullNotification NullString
+	var nullNotification common.NullString
 	if notification != "" {
 		nullNotification.Valid = true
 		nullNotification.String = notification
 	}
 
-	tx, err := DB.BeginTx(ctx, nil)
+	tx, err := common.DB.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
@@ -592,7 +693,7 @@ func SetParameterNotification(ctx context.Context, path string, notification str
 }
 
 func DeleteParameter(ctx context.Context, path string, version int, comment string) error {
-	tx, err := DB.BeginTx(ctx, nil)
+	tx, err := common.DB.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
@@ -633,7 +734,7 @@ func DeleteParameter(ctx context.Context, path string, version int, comment stri
 }
 
 func selectParameterForUpdate(ctx context.Context, tx *sql.Tx, path string) (*Parameter, error) {
-	row := tx.QueryRowContext(ctx, selectFromConfig+"WHERE Path = ? AND NOT Deleted FOR UPDATE", Username(ctx), path)
+	row := tx.QueryRowContext(ctx, selectFromConfig+"WHERE Path = ? AND NOT Deleted FOR UPDATE", common.Username(ctx), path)
 	p := Parameter{}
 	err := row.Scan(
 		&p.ID, &p.Name, &p.ParentID, &p.Path, &p.Value, &p.ContentType,
@@ -652,7 +753,7 @@ func selectParameterForUpdate(ctx context.Context, tx *sql.Tx, path string) (*Pa
 	return &p, nil
 }
 
-func validateParameter(ctx context.Context, contentType string, value NullString) error {
+func validateParameter(ctx context.Context, contentType string, value common.NullString) error {
 	switch contentType {
 	case "application/x-null":
 		if value.Valid {
@@ -694,7 +795,7 @@ func validateParameter(ctx context.Context, contentType string, value NullString
 		if !value.Valid {
 			return ErrInvalidValue
 		}
-		var cases []map[string]NullString
+		var cases []map[string]common.NullString
 		if err := json.Unmarshal([]byte(value.String), &cases); err != nil {
 			return err
 		}
@@ -729,7 +830,7 @@ func validateParameter(ctx context.Context, contentType string, value NullString
 
 func validateNotification(ctx context.Context, notification string) error {
 	if notification == "none" {
-		root, err := UserIsRoot(ctx, Username(ctx))
+		root, err := UserIsRoot(ctx, common.Username(ctx))
 		if err != nil {
 			return err
 		} else if !root {

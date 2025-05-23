@@ -31,6 +31,7 @@ interface ConfigTreeNodeProps {
 	onView: (param: IParamNode) => void;
 	onEdit: (param: IParamNode) => void;
 	onMove: (param: IParamNode) => void;
+	onCopy: (param: IParamNode) => void;
 	onDescribe: (param: IParamNode) => void;
 	onNotification: (param: IParamNode) => void;
 	onAccess: (path: string) => void;
@@ -81,6 +82,7 @@ export default function ConfigTreeNode(props: ConfigTreeNodeProps) {
 				onReload={() => props.onReload(param)}
 				onDelete={() => props.onDelete(param)}
 				onMove={() => props.onMove(param)}
+				onCopy={() => props.onCopy(param)}
 				onValuePopoverOpen={event => props.onValuePopoverOpen(event, param)}
 				onValuePopoverClose={props.onValuePopoverClose}
 			/>}

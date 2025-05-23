@@ -197,6 +197,7 @@ export default class ConfigTreeParam extends React.Component<ConfigTreeParamProp
 						onReload={this.props.onReload}
 						onDelete={this.props.onDelete}
 						onMove={this.props.onMove}
+						onCopy={this.props.onCopy}
 					/>
 				)}
 				<ConfigTreeParamPreview

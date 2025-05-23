@@ -1,6 +1,6 @@
 services:
   onlineconf-admin:
-    image: ghcr.io/nikolo/onlineconf-admin:latest
+    image: 9ccfbbac7f6cb8941c7547b74308ece65b7d9314aa7a6cc4d690686ac470f37d
     depends_on:
       onlineconf-database:
         condition: service_healthy
@@ -41,7 +41,7 @@ services:
       - ./etc/nginx.htpasswd:/usr/share/nginx/.htpasswd:ro # docker run --rm --entrypoint htpasswd registry:2.7.0 -Bbn admin admin > etc/nginx.htpasswd
       - staticshare:/usr/local/www/onlineconf
     ports:
-      - "80:80"
+      - "8010:80"
     environment:
       - NGINX_PORT=80
       - NGINX_ADMIN_HOST=onlineconf-admin

@@ -109,6 +109,8 @@ func serveSetConfig(w http.ResponseWriter, req *http.Request) {
 
 		if newPath := f.Get("path"); newPath != "" {
 			err = MoveParameter(req.Context(), path, newPath, f.Get("symlink") == "1", version, f.Get("comment"))
+		} else if newPath := f.Get("copy_path"); newPath != "" {
+			err = CopyParameter(req.Context(), path, newPath, version, f.Get("comment"))
 		} else {
 			err = SetParameter(req.Context(), path, version, f.Get("mime"), f.Get("data"), f.Get("comment"))
 		}
