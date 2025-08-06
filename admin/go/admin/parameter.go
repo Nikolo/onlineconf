@@ -486,6 +486,17 @@ func SetParameter(ctx context.Context, path string, version int, contentType str
 func CopyTree(ctx context.Context, children []ParameterWithSubtree, path, newPath, comment string) error {
 	for _, child := range children {
 		newFullPath := newPath + child.Path[len(path):]
+		notificationParam := sql.NullString{
+			Valid:  true,
+			String: child.Notification,
+		}
+
+		if validateNotification(ctx, child.Notification) != nil {
+			notificationParam = sql.NullString{
+				Valid: false,
+			}
+		}
+
 		err := CreateParameter(ctx,
 			newFullPath,
 			child.ContentType,
@@ -503,10 +514,7 @@ func CopyTree(ctx context.Context, children []ParameterWithSubtree, path, newPat
 				},
 			},
 			common.NullString{
-				NullString: sql.NullString{
-					Valid:  true,
-					String: child.Notification,
-				},
+				NullString: notificationParam,
 			},
 			comment)
 		if err != nil {
