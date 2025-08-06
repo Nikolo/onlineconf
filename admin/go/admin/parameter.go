@@ -536,6 +536,17 @@ func CopyParameter(ctx context.Context, path string, newPath string, version int
 		return err
 	}
 
+	notificationParam := sql.NullString{
+		Valid:  true,
+		String: p.Notification,
+	}
+
+	if validateNotification(ctx, p.Notification) != nil {
+		notificationParam = sql.NullString{
+			Valid: false,
+		}
+	}
+
 	err = CreateParameter(ctx,
 		newPath,
 		p.ContentType,
@@ -553,10 +564,7 @@ func CopyParameter(ctx context.Context, path string, newPath string, version int
 			},
 		},
 		common.NullString{
-			NullString: sql.NullString{
-				Valid:  true,
-				String: p.Notification,
-			},
+			NullString: notificationParam,
 		},
 		comment)
 	if err != nil {
