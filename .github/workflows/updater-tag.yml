@@ -3,7 +3,7 @@ name: Release new updater version
 on:
   push:
     tags:
-      - v*
+      - onlineconf-updater/v*
 
 jobs:
   updater-make-latest:
