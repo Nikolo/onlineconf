@@ -1,6 +1,6 @@
 services:
   onlineconf-admin:
-    image: 9ccfbbac7f6cb8941c7547b74308ece65b7d9314aa7a6cc4d690686ac470f37d
+    image: ghcr.io/nikolo/onlineconf-admin:03daa51
     depends_on:
       onlineconf-database:
         condition: service_healthy
@@ -30,7 +30,7 @@ services:
       MYSQL_USER: onlineconf
       MYSQL_PASSWORD: onlineconf
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       timeout: 10s
       interval: 1s
       retries: 60
